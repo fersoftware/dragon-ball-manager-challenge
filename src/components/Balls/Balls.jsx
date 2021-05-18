@@ -35,7 +35,7 @@ const Balls = ({ balls, profile }) => {
 
   const toggle = () => setModal(!modal);
 
-  const validateBall = (ball) => {
+  const openModalBall = (ball) => {
     setBall(ball)
     setModal(true)
   }
