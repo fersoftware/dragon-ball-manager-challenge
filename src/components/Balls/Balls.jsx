@@ -24,12 +24,13 @@ import styled from 'styled-components';
 
 const Card = styled(BCard)`
   height: 280px;
-  margin: 5px 0px;
+  margin: 5px 0;
 `;
 
 const Balls = ({ balls, profile }) => {
   const [list, setList] = useState(balls);
   const [modal, setModal] = useState(false);
+  const [modalError, setModalError] = useState(false);
   const [currentBall, setBall] = useState(null);
 
   const toggle = () => setModal(!modal);
@@ -57,6 +58,13 @@ const Balls = ({ balls, profile }) => {
   };
 
   const updateList = (id) => {
+    const valueCodeBall = parseInt(document.getElementById('code').value)
+
+    if(valueCodeBall !== id){
+      setModalError(true)
+      return;
+    }
+
     const newList = balls.map((ball) => {
       if(ball.id === id) return {
         ...ball,
@@ -93,19 +101,19 @@ const Balls = ({ balls, profile }) => {
         {list.length > 0 ? (
           list.map((ball, i) => (
             <Col sm='3' key={ball.id}>
-              <Card>
+              <Card data-cy='card'>
                 <CardImg top width='100%' src={ball.image} alt={ball.name} />
                 <CardBody>
                   <CardTitle>{ball.name}</CardTitle>
                   {ball.owner !== profile.id ? (
                     <>
-                      <Badge color='danger'>Não encontrada</Badge>
-                      <Button size='sm' color='warning' onClick={() => validateBall(ball)}>
+                      <Badge data-cy='msg-not-found' color='danger'>Não encontrada</Badge>
+                      <Button data-cy='btn-found-ball' size='sm' color='warning' onClick={() => openModalBall(ball)}>
                         encontrei
                       </Button>
                     </>
                   ) : (
-                    <Badge color='success'>Encontrada</Badge>
+                    <Badge data-cy='msg-success' color='success'>Encontrada</Badge>
                   )}
                 </CardBody>
               </Card>
@@ -116,6 +124,16 @@ const Balls = ({ balls, profile }) => {
         )}
       </Row>
       {/* Validate ball */}
+
+      <Modal isOpen={modalError}>
+        <Text data-testid="modaltextError">Código inválido!</Text>
+        <ModalFooter>
+          <Button color='secondary' data-testid="backError" onClick={() => setModalError(false) }>
+            Voltar
+          </Button>
+        </ModalFooter>
+      </Modal>
+
       <Modal isOpen={modal} toggle={toggle}>
         <ModalBody>
           <FormGroup>
@@ -124,15 +142,16 @@ const Balls = ({ balls, profile }) => {
               type='number'
               name='ballcode'
               id='code'
+              data-testid='code'
               placeholder='Ex: 23412'
             />
           </FormGroup>
         </ModalBody>
         <ModalFooter>
-        <Button color='success' onClick={() => updateList(currentBall?.id)}>
+        <Button data-testid="validateBall" color='success' onClick={() => updateList(currentBall?.id)}>
             Validar
           </Button>
-          <Button color='secondary' onClick={toggle}>
+          <Button data-testid="backValidateBall" color='secondary' onClick={toggle}>
             Voltar
           </Button>
         </ModalFooter>
